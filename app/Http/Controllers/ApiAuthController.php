@@ -26,5 +26,6 @@ class ApiAuthController extends Controller
         }
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['token' => $token]);
+        
     }
 }
