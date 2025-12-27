@@ -11,6 +11,6 @@ Route::get('/tasks/{id}', [taskcontroller::class, 'show']);
 Route::post('/tasks', [taskcontroller::class, 'store']);
 Route::put('/tasks/{id}', [taskcontroller::class, 'update']);
 Route::delete('/tasks/{id}', [taskcontroller::class, 'destroy']);
-use App\Http\Controllers\CategoryController;
-
+use App\Http\Controllers\Api\CategoryController;
+Route::get('/categories', [CategoryController::class, 'index']);
 Route::apiResource('categories', CategoryController::class);
