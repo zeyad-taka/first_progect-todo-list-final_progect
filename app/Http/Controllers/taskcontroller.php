@@ -1,32 +1,62 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Task; 
+use App\Models\Task;
 
-class taskcontroller extends Controller
+class TaskController extends Controller
 {
-    public function index() { return response()->json(Task::all()); }
-    public function show($id) { return response()->json(Task::find($id)); }
+    // عرض كل التاسكات
+    public function index() {
+        return response()->json(Task::all());
+    }
 
+    // إضافة تاسك جديد من Form Data
     public function store(Request $request) {
         $task = Task::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => 'pending'
+            'title'       => $request->title,
+            'description' => $request->description, // سحب الوصف من Postman
+            'status'      => $request->status ?? 'pending',
+            'user_id'     => $request->user_id, // سحب الـ ID اللي باعتينه في الصورة
         ]);
-        return response()->json(['message' => 'Task Created', 'task' => $task]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Task Created Successfully',
+            'task'    => $task
+        ], 201);
     }
 
+    // تعديل تاسك موجود
     public function update(Request $request, $id) {
         $task = Task::find($id);
-        $task->update($request->all());
-        return response()->json(['message' => 'Task Updated', 'task' => $task]);
+
+        if (!$task) {
+            return response()->json(['message' => 'Task Not Found'], 404);
+        }
+
+        $task->update([
+            'title'       => $request->title ?? $task->title,
+            'description' => $request->description ?? $task->description,
+            'status'      => $request->status ?? $task->status,
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Task Updated Successfully',
+            'task'    => $task
+        ]);
     }
 
+    // حذف تاسك
     public function destroy($id) {
-        Task::destroy($id);
-        return response()->json(['message' => 'Task Deleted']);
+        $task = Task::find($id);
+        if ($task) {
+            $task->delete();
+            return response()->json(['status' => true, 'message' => 'Deleted successfully']);
+        }
+        return response()->json(['status' => false, 'message' => 'Not found'], 404);
     }
 }
